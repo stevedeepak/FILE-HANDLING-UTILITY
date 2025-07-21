@@ -46,3 +46,36 @@ public class ChatServer {
         }
     }
 }
+import java.io.*;
+import java.net.*;
+
+public class ChatClient {
+    public static void main(String[] args) {
+        try (Socket socket = new Socket("localhost", 1234)) {
+            BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+
+            // Send messages
+            new Thread(() -> {
+                try {
+                    String userInput;
+                    while ((userInput = input.readLine()) != null) {
+                        out.println(userInput);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+            // Receive messages
+            String response;
+            while ((response = in.readLine()) != null) {
+                System.out.println(response);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
